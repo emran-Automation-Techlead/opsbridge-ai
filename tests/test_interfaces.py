@@ -134,3 +134,48 @@ def test_every_spec_has_at_least_one_test(spec_map):
     from conftest import spec_ids
     missing = [s for s in spec_ids() if not spec_map.get(s)]
     assert not missing, f"specs without tests: {missing}"
+
+
+# ---------------------------------------------------------------- SPEC-015 (cost caps)
+class UsageStub:
+    def __init__(self): self.calls = 0
+
+    def converse(self, **kw):
+        self.calls += 1
+        return {"output": {"message": {"content": [{"text": "ok [1]"}]}}, "usage": {"inputTokens": 100, "outputTokens": 20}, "metrics": {"latencyMs": 250}}
+
+
+@pytest.mark.spec("SPEC-015")
+def test_bedrock_usage_is_tracked_and_calls_are_capped():
+    stub = UsageStub()
+    prov = BedrockProvider("m", client=stub, max_calls=2)
+    prov.compose("q one here", ["source"])
+    prov.compose("q two here", ["source"])
+    assert (prov.calls, prov.input_tokens, prov.output_tokens, prov.latency_ms) == (2, 200, 40, [250, 250])
+    with pytest.raises(RuntimeError, match="cap reached"):
+        prov.compose("q three here", ["source"])
+    assert stub.calls == 2  # the third call never reached AWS
+
+
+@pytest.mark.spec("SPEC-015")
+def test_abstained_questions_make_no_paid_call():
+    from opsbridge import answer
+    stub = UsageStub()
+    prov = BedrockProvider("m", client=stub, max_calls=5)
+    a = answer.ask("What is the dress code in the office?", provider=prov)
+    assert a.abstained and stub.calls == 0
+
+
+class _Free:
+    def __init__(self, plan="FREE", status="ACTIVE", credits=120.0): self.s = {"accountPlanType": plan, "accountPlanStatus": status, "accountPlanRemainingCredits": {"amount": credits}}
+    def client(self, name, **kw): return self
+    def get_account_plan_state(self): return self.s
+
+
+@pytest.mark.spec("SPEC-015")
+def test_paid_calls_need_a_free_plan_with_credits():
+    from opsbridge import aws_guard
+    assert aws_guard.check_free_plan(_Free()) == 120.0
+    for bad in (_Free(plan="PAID"), _Free(status="CLOSED"), _Free(credits=3.0)):
+        with pytest.raises(RuntimeError):
+            aws_guard.check_free_plan(bad)

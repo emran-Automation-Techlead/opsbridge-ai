@@ -44,3 +44,6 @@ Given the Lambda handler behind an API, When a request arrives, Then only /healt
 
 ## SPEC-014 Safe, reversible cloud deployment
 Given the deployment script, When it is run, Then plan mode prints resources and a cost estimate without calling AWS, apply needs an explicit profile and approval flag, creates only the opsbridge-live resources with least-privilege settings and no secrets in the function environment, rolls back everything if any step fails, and destroy removes everything and is safe to repeat.
+
+## SPEC-015 Cost caps for live LLM calls
+Given live Bedrock calls on a Free-plan account, When the demo runs, Then it refuses unless the plan is FREE/ACTIVE with credits, never exceeds a hard cap on paid calls, makes no paid call for questions it abstains on, and reports real token usage.
