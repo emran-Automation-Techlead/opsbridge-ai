@@ -16,7 +16,7 @@
 About 4 paid calls x (roughly 350 input + up to 300 output tokens). At an **assumed** USD 0.06 / 0.24 per million tokens that is **about USD 0.001**; the hard cap of 10 calls bounds the worst case at **under USD 0.01**, even if real prices were 10x higher. It is drawn from your USD 120 Free-plan credits; the script refuses to run unless the account is FREE/ACTIVE with credits (tested). Questions that abstain make no call.
 
 ## Permission needed (one statement)
-`deploy/bedrock-demo-policy.json` (also included in the combined `deploy/deployer-policy.json`): `bedrock:InvokeModel` on that one model ARN in ap-southeast-2 only. No other service, no other model, no write access to anything. Attach to `portfolio-readonly` temporarily; detach afterwards. Also detach and delete the earlier `opsbridge-live-deployer` (no longer useful).
+`deploy/bedrock-demo-policy.json` (also included in the combined `deploy/deployer-policy.json`): `bedrock:InvokeModel` on that one model ARN in ap-southeast-2 only. No other service, no other model, no write access to anything. Update the existing managed policy `opsbridge-live-deployer` with the combined JSON (it is already attached to `portfolio-readonly`), delete the old Mumbai inline policy `opsbridge-bedrock-demo`, and detach/delete the policy when finished.
 
 ## Rollback
 Nothing is created. Rollback = detach the policy. Billing check: Billing > Bills / Cost Explorer after 24 hours.
