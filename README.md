@@ -70,6 +70,7 @@ approved by Dana Wu: escalate_to_legal -> legal case 0a1fe52a
 ```
 
 ## Tests and results (run on 2026-10-20, Python 3.11, Windows)
+- **CI on GitHub Actions (Ubuntu, Python 3.11): passing** - lint, 79 tests, quality gate and secret scan (first runs failed on lint, a missing PYTHONPATH and a deliberately fake test key; all three were fixed in follow-up commits).
 - `python -m pytest -q` -> **79 passed**. Every specification in `specs/SPECS.md` is linked to tests; [docs/TRACEABILITY.md](docs/TRACEABILITY.md) is generated on each run, and a test fails if a spec has none.
 - `python -m opsbridge.evaluate` -> gate **passed**: hit@3 1.00, citation precision 1.00, abstention accuracy 1.00, false-abstain rate 0.00, classification 1.00, routing 1.00, field accuracy 1.00, unsafe executions 0; latency p50 about 1 ms, p95 about 3 ms (local, in-process). See [docs/EVALUATION.md](docs/EVALUATION.md).
 
@@ -94,7 +95,7 @@ See [docs/IJP_MAPPING.md](docs/IJP_MAPPING.md): process automation, AI-first sol
 - Extraction is rule-based; no LLM extraction, no OCR/scanned documents, English only, synthetic emails only.
 - Tools are mocks (JSONL files), not real ticketing or policy systems.
 - Tracing is a small local implementation, not Langfuse/Arize/OpenTelemetry export.
-- No load test beyond a few calls; the CI workflow has not run on GitHub yet; the AWS deployment was a short-lived demo, not a production rollout.
+- No load test beyond a few calls; the AWS deployment was a short-lived demo, not a production rollout.
 - Next: embeddings + vector store comparison, LLM extraction behind the same schema, Ragas/LLM-judge evaluation, OTel export, SSO in front of the API, real integrations.
 
 ## Interview talking points
