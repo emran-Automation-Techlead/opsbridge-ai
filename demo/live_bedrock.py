@@ -22,8 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 os.environ.setdefault("OPSBRIDGE_RUNS", tempfile.mkdtemp(prefix="opsbridge_live_"))
 
-from opsbridge import answer, aws_guard  # noqa: E402
-from opsbridge.providers import BedrockProvider  # noqa: E402
+from opsbridge import answer, aws_guard
+from opsbridge.providers import BedrockProvider
 
 # ASSUMED on-demand prices in USD per 1M tokens (Amazon Nova Lite class; the real price may differ). Verify on the Bedrock pricing page / Billing console.
 ASSUMED_PRICE_IN, ASSUMED_PRICE_OUT = 0.06, 0.24

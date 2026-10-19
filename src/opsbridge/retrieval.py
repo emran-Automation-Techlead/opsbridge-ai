@@ -17,9 +17,7 @@ from pathlib import Path
 
 from . import config
 
-STOP = set("a an the of to for in on at by with and or but is are was were be been being it its this that these those there their they them "
-           "what which who whom whose when where why how do does did can could should would must may might will shall i me my we our you your he she "
-           "as from into than then so if not no yes about before after over under tell please".split())
+STOP = {"a", "an", "the", "of", "to", "for", "in", "on", "at", "by", "with", "and", "or", "but", "is", "are", "was", "were", "be", "been", "being", "it", "its", "this", "that", "these", "those", "there", "their", "they", "them", "what", "which", "who", "whom", "whose", "when", "where", "why", "how", "do", "does", "did", "can", "could", "should", "would", "must", "may", "might", "will", "shall", "i", "me", "my", "we", "our", "you", "your", "he", "she", "as", "from", "into", "than", "then", "so", "if", "not", "no", "yes", "about", "before", "after", "over", "under", "tell", "please"}
 
 
 def stem(w: str) -> str:
@@ -66,7 +64,7 @@ class Retriever:
 
     def _load(self, path: Path) -> None:
         doc_id = "-".join(path.stem.split("-")[:2])
-        title, heading, buf, idx = path.stem, "", [], 0
+        title, heading, buf = path.stem, "", []
         parts: list[tuple[str, str]] = []
         for line in path.read_text(encoding="utf-8").splitlines():
             if line.startswith("# "):
@@ -79,8 +77,7 @@ class Retriever:
                 buf.append(line.strip())
         if buf:
             parts.append((heading, " ".join(buf)))
-        for heading, body in parts:
-            idx += 1
+        for idx, (heading, body) in enumerate(parts, 1):
             toks = tokens(f"{title} {heading} {body}")
             self.chunks.append(Chunk(f"{doc_id}#{idx}", doc_id, title, heading, body, Counter(toks), len(toks)))
 

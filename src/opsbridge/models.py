@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from datetime import date
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -41,12 +40,12 @@ class Answer(BaseModel):
 
 
 class ExtractedRequest(BaseModel):
-    requester: Optional[str] = None
-    department: Optional[str] = None
-    subject: Optional[str] = None
+    requester: str | None = None
+    department: str | None = None
+    subject: str | None = None
     priority: Priority = Priority.medium
-    due_date: Optional[date] = None
-    policy_id: Optional[str] = None
+    due_date: date | None = None
+    policy_id: str | None = None
 
 
 class ToolCall(BaseModel):
@@ -60,7 +59,7 @@ class ActionResult(BaseModel):
     impact: str
     status: str  # executed | pending_approval | rejected | invalid | not_allowed
     detail: str = ""
-    approval_id: Optional[str] = None
+    approval_id: str | None = None
 
 
 class ProcessResult(BaseModel):

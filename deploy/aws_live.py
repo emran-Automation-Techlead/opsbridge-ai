@@ -36,7 +36,7 @@ def estimate(requests: int = 500) -> list[tuple[str, str]]:
         ("CloudWatch Logs: ~1 MB ingested, 3-day retention", "about USD 0.001"),
         ("SSM Parameter Store (standard SecureString), IAM role", "USD 0.00"),
         ("Idle cost after the demo", "about USD 0.00 (no hourly resources); resources are deleted anyway"),
-        ("TOTAL for a demo of this size", f"under USD 0.01-0.05, paid from your USD 120 credits first"),
+        ("TOTAL for a demo of this size", "under USD 0.01-0.05, paid from your USD 120 credits first"),
     ]
 
 
@@ -142,7 +142,7 @@ def destroy(session, region: str) -> list[str]:
     def attempt(label, fn):
         try:
             fn(); removed.append(label)
-        except Exception as exc:  # already gone or not allowed: report, keep going
+        except Exception as exc:  # noqa: BLE001 - teardown must keep going; already gone or not allowed is reported
             code = getattr(exc, "response", {}).get("Error", {}).get("Code", type(exc).__name__)
             if code not in ("ResourceNotFoundException", "NoSuchEntity", "NotFoundException", "ParameterNotFound"):
                 print(f"  could not remove {label}: {code}")
@@ -150,7 +150,7 @@ def destroy(session, region: str) -> list[str]:
         for a in apig.get_apis()["Items"]:
             if a["Name"] == NAME:
                 attempt(f"api {a['ApiId']}", lambda a=a: apig.delete_api(ApiId=a["ApiId"]))
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - report and continue with the rest of the teardown
         print("  could not list APIs:", type(exc).__name__)
     attempt("lambda", lambda: lam.delete_function(FunctionName=NAME))
     attempt("ssm api key", lambda: ssm.delete_parameter(Name=PARAM_API))

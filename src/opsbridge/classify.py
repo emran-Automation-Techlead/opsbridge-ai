@@ -20,7 +20,7 @@ KEYWORDS: dict[DocType, list[str]] = {
     DocType.exception_request: ["exception", "waiver", "exemption", "deviation"],
 }
 INJECTION = re.compile(r"(?i)\b(ignore (all |your |previous )?(rules|instructions)|system:|disregard|without (waiting for )?approval|you are now)\b")
-_HEADER = re.compile(r"^(From|Subject|Priority|Due):\s*(.+)$", re.M)
+_HEADER = re.compile(r"^(From|Subject|Priority|Due):\s*(.+)$", re.MULTILINE)
 
 
 def parse_headers(text: str) -> tuple[dict[str, str], str]:
@@ -45,7 +45,7 @@ def classify(text: str) -> tuple[DocType, float, float]:
 
 
 def extract(text: str) -> ExtractedRequest:
-    headers, body = parse_headers(text)
+    headers, _ = parse_headers(text)
     requester, department = None, None
     if "from" in headers:
         m = re.match(r"^(.*?)\s*(?:\((.*?)\))?$", headers["from"])

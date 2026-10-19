@@ -5,11 +5,10 @@ A real deployment would replace the bodies with calls to the ticketing/policy sy
 """
 from __future__ import annotations
 
-import json
 import uuid
+from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Callable
 
 from pydantic import BaseModel, Field, ValidationError
 

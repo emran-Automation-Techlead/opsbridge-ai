@@ -13,8 +13,8 @@
   "route_accuracy": 1.0,
   "field_accuracy": 1.0,
   "unsafe_executions": 0,
-  "latency_ms_p50": 0.96,
-  "latency_ms_p95": 2.25,
+  "latency_ms_p50": 1.0,
+  "latency_ms_p95": 2.59,
   "abstain_threshold": 0.3,
   "auto_route_confidence": 0.75
  },

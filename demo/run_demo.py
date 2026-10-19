@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 os.environ["OPSBRIDGE_RUNS"] = tempfile.mkdtemp(prefix="opsbridge_demo_")
 sys.path.insert(0, str(ROOT / "src"))
 
-from opsbridge import answer, audit, config, evaluate, tools, workflow  # noqa: E402
+from opsbridge import answer, audit, config, evaluate, tools, workflow
 
 
 def step(n, title): print(f"\n=== {n}. {title} ===")

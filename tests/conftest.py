@@ -32,7 +32,7 @@ def pytest_runtest_logreport(report):
 
 
 def spec_ids() -> list[str]:
-    return re.findall(r"^## (SPEC-\d{3})", (ROOT / "specs" / "SPECS.md").read_text(encoding="utf-8"), re.M)
+    return re.findall(r"^## (SPEC-\d{3})", (ROOT / "specs" / "SPECS.md").read_text(encoding="utf-8"), re.MULTILINE)
 
 
 def pytest_sessionfinish(session, exitstatus):
