@@ -15,9 +15,11 @@ jobs:
       - run: pip install -r requirements.txt ruff
       - name: Lint
         run: ruff check src tests demo
-      - name: Tests (57 expected)
+      - name: Tests
         run: python -m pytest -q
       - name: Quality gate
+        env:
+          PYTHONPATH: src
         run: python -m opsbridge.evaluate
       - name: Secret scan (simple patterns; fails the build on a match)
         run: |
