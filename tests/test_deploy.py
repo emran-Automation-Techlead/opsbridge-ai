@@ -65,7 +65,7 @@ def test_apply_creates_everything_with_safe_settings_then_destroy_removes_everyt
             c.update_stage = lambda **kw: calls.append(kw)
         return c
     monkeypatch.setattr(session, "client", client)
-    aws_live.apply(session, REGION, z, smoke=False)
+    aws_live.apply(session, REGION, z, smoke=False, check_plan=False)
     assert calls and calls[0]["StageName"] == "$default" and calls[0]["DefaultRouteSettings"] == {"ThrottlingBurstLimit": 10, "ThrottlingRateLimit": 5.0}
     inv = _inventory(session)
     assert inv["tables"] == ["opsbridge-live"] and inv["functions"] == ["opsbridge-live"] and inv["apis"] == ["opsbridge-live"]
@@ -104,7 +104,7 @@ def test_failed_apply_rolls_back_everything(cloud, monkeypatch):
         return c
     monkeypatch.setattr(session, "client", client)
     with pytest.raises(RuntimeError):
-        aws_live.apply(session, REGION, z, smoke=False)
+        aws_live.apply(session, REGION, z, smoke=False, check_plan=False)
     monkeypatch.undo()
     assert all(not v for v in _inventory(session).values())
 
@@ -114,3 +114,31 @@ def test_destroy_is_safe_to_run_twice(cloud):
     session, _ = cloud
     assert aws_live.destroy(session, REGION) == []
     assert aws_live.destroy(session, REGION) == []
+
+
+class _FakeFreeTier:
+    def __init__(self, plan="FREE", status="ACTIVE", credits=120.0): self.s = {"accountPlanType": plan, "accountPlanStatus": status, "accountPlanRemainingCredits": {"amount": credits, "unit": "USD"}}
+    def get_account_plan_state(self): return self.s
+
+
+class _FakeSession:
+    def __init__(self, ft): self.ft = ft
+    def client(self, name, **kw):
+        assert name == "freetier"
+        return self.ft
+
+
+@pytest.mark.spec("SPEC-014")
+def test_plan_guard_allows_only_free_plan_with_credits():
+    assert aws_live.check_free_plan(_FakeSession(_FakeFreeTier())) == 120.0
+    for bad in (_FakeFreeTier(plan="PAID"), _FakeFreeTier(status="CLOSED"), _FakeFreeTier(credits=5.0)):
+        with pytest.raises(RuntimeError):
+            aws_live.check_free_plan(_FakeSession(bad))
+
+
+@pytest.mark.spec("SPEC-014")
+def test_apply_creates_nothing_when_the_plan_guard_fails(cloud):
+    session, z = cloud
+    with pytest.raises(RuntimeError):
+        aws_live.apply(_FakeSession(_FakeFreeTier(plan="PAID")), REGION, z, smoke=False)
+    assert all(not v for v in _inventory(session).values())

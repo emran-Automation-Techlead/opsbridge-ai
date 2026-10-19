@@ -54,10 +54,28 @@ def plan_text(region: str) -> str:
     return "\n".join(lines)
 
 
+MIN_CREDITS_USD = 20.0
+
+
+def check_free_plan(session) -> float:
+    """Refuse to deploy unless the account is on the AWS FREE plan (usage is paid from credits, never billed) with credits left.
+    Raises RuntimeError otherwise. Uses the read-only Free Tier API; there is deliberately no flag to skip this from the command line."""
+    state = session.client("freetier", region_name="us-east-1").get_account_plan_state()
+    plan, status = state.get("accountPlanType"), state.get("accountPlanStatus")
+    credits = float((state.get("accountPlanRemainingCredits") or {}).get("amount", 0))
+    if plan != "FREE" or status != "ACTIVE":
+        raise RuntimeError(f"account plan is {plan}/{status}, not FREE/ACTIVE: refusing to create anything that could be billed")
+    if credits < MIN_CREDITS_USD:
+        raise RuntimeError(f"only USD {credits:.2f} of credits left (minimum {MIN_CREDITS_USD:.0f}): refusing to deploy")
+    return credits
+
+
 def _tags_list(): return [{"Key": k, "Value": v} for k, v in TAGS.items()]
 
 
-def apply(session, region: str, zip_path: Path, smoke: bool = True) -> dict:
+def apply(session, region: str, zip_path: Path, smoke: bool = True, check_plan: bool = True) -> dict:
+    if check_plan:
+        print(f"Free plan confirmed: USD {check_free_plan(session):.2f} of credits remaining (usage is paid from credits).")
     sts = session.client("sts"); account = sts.get_caller_identity()["Account"]
     iam, ddb, logs, lam, ssm, apig = (session.client(s, region_name=region) for s in ("iam", "dynamodb", "logs", "lambda", "ssm", "apigatewayv2"))
     iam = session.client("iam")

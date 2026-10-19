@@ -16,6 +16,14 @@ flowchart LR
 ```
 Answers are extractive (no LLM). **Bedrock is not used** and would be a separate, separately-approved step.
 
+## Free-plan safety (you cannot afford paid AWS: this is designed around that)
+- Your account's plan, read from the Free Tier API on 2026-10-20: **FREE, ACTIVE, USD 120 credits remaining, plan ends 2027-04-16**.
+- AWS documentation: on a Free plan, usage is covered by credits and you are **not billed**; when credits run out or the plan period ends the **account closes** (data kept 90 days) unless you upgrade to a Paid plan. So the risk is losing the account, not receiving a bill.
+- **Never click "Upgrade to Paid plan"**, and avoid actions AWS says auto-upgrade a Free account (for example Control Tower, AWS Partner Network, Professional Services contracts, Enterprise Agreements).
+- The deploy tool re-checks the plan before creating anything and **refuses unless the plan is FREE/ACTIVE with at least USD 20 in credits**. There is no command-line flag to bypass it.
+- The demo's expected use is a few cents of the USD 120. Free plans also exclude services that could drain credits, which is probably why the organisation policy blocks several services.
+- Sources: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/free-tier-plans.html and https://docs.aws.amazon.com/accounts/latest/reference/upgrade-account.html. Credit-expiry wording differs between AWS pages; check the Credits page in the console.
+
 ## Resources (all named `opsbridge-live*`, tagged `project=opsbridge`)
 DynamoDB table (on-demand, TTL), CloudWatch log group (3 days), IAM role `opsbridge-live-lambda` (least privilege: this table, this log group, two parameters), two SSM SecureString parameters, Lambda function, HTTP API with throttling. **Not created:** EC2, RDS, NAT gateway, load balancer, KMS customer key, Secrets Manager, any Bedrock call.
 
