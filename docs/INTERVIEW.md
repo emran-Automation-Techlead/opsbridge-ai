@@ -1,7 +1,7 @@
 # Interview talking points (answer frameworks, adapt to what you have done)
 
 ## 60-second pitch
-"I built OpsBridge AI to show how I would deliver an AI automation for policy and content operations. It turns request emails into classified, validated tickets, answers policy questions only with citations or says it doesn't know, and holds every high-impact action for a named human approver. It has 57 tests, a quality gate with real metrics, redacted audit logs and traces. The data is synthetic and it isn't deployed; I'm explicit about that. What I want to show is the discipline: acceptance criteria first, controls built in, measured quality, honest limits."
+"I built OpsBridge AI to show how I would deliver an AI automation for policy and content operations. It turns request emails into classified, validated tickets, answers policy questions only with citations or says it doesn't know, and holds every high-impact action for a named human approver. It has 79 tests, a quality gate with real metrics, redacted audit logs and traces. The data is synthetic; it ran live on AWS for a short demo and was torn down, and I'm explicit about that. What I want to show is the discipline: acceptance criteria first, controls built in, measured quality, honest limits."
 
 ## Technical questions
 1. **Why abstain, and how did you set the threshold?** Wrong answers cost more than "I don't know". Coverage is the idf-weighted share of question terms found in the best chunk. On my small set out-of-scope questions peaked at 0.17 and valid ones started at 0.41, so I used 0.30 (the midpoint). My first guess of 0.45 wrongly abstained on 2 of 18 valid questions. The gap on real data will be narrower, so I'd recalibrate on real traffic.

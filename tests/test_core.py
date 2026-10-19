@@ -169,3 +169,21 @@ def test_trace_has_unique_id_and_spans():
     lines = [json.loads(x) for x in (config.runs_dir() / "trace.jsonl").read_text(encoding="utf-8").splitlines()]
     assert a.trace_id != b.trace_id and len(lines) == 2
     assert {s["span"] for s in lines[0]["spans"]} >= {"retrieve", "compose"} and all("duration_ms" in s for s in lines[0]["spans"])
+
+
+@pytest.mark.spec("SPEC-006")
+def test_timestamps_and_ids_survive_redaction_but_phones_do_not():
+    from opsbridge.redact import redact, redact_text
+    ev = redact({"ts": "2026-10-19T22:58:47.123456+00:00", "trace_id": "4670dc72072e5a1b9c3d8e7f6a5b4c3d", "details": {"note": "call +91 98765 43210 or (555) 123-4567 on 2026-10-19"}})
+    assert ev["ts"] == "2026-10-19T22:58:47.123456+00:00" and ev["trace_id"] == "4670dc72072e5a1b9c3d8e7f6a5b4c3d"
+    assert "98765" not in ev["details"]["note"] and "123-4567" not in ev["details"]["note"] and "2026-10-19" in ev["details"]["note"]
+    assert redact_text("due 2026-11-20 at 10:30:00") == "due 2026-11-20 at 10:30:00"
+    assert redact_text("order 12345") == "order 12345"
+
+
+@pytest.mark.spec("SPEC-006")
+def test_stored_audit_events_keep_a_real_timestamp():
+    from datetime import datetime
+    answer.ask("How long are audit logs retained?")
+    events = audit.read_all()
+    assert events and all(datetime.fromisoformat(e["ts"]) for e in events)

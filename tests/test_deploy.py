@@ -82,10 +82,11 @@ def test_apply_creates_everything_with_safe_settings_then_destroy_removes_everyt
     pol = session.client("iam").get_role_policy(RoleName="opsbridge-live-lambda", PolicyName="least-privilege")["PolicyDocument"]
     resources = json.dumps(pol)
     assert '"*"' not in resources and "dynamodb:Scan" not in resources and "dynamodb:DeleteItem" not in resources
+    test_secrets_path = aws_live.SECRETS_FILE  # the temp path used by this test (undo() would restore the real one)
     aws_live.destroy(session, REGION)
     monkeypatch.undo()
     assert all(not v for v in _inventory(session).values())
-    assert not aws_live.SECRETS_FILE.exists()
+    assert not test_secrets_path.exists()
 
 
 @pytest.mark.spec("SPEC-014")
