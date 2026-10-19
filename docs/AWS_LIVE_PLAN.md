@@ -1,6 +1,9 @@
 # OpsBridge on AWS - live demo plan (needs approval before anything is created)
 
-**Status: PLAN ONLY. Nothing has been created in AWS.** Tests for the cloud code run against a local AWS mock (moto).
+**Status: BLOCKED (2026-10-20). Nothing exists in AWS.** The apply was attempted once with the approved permissions; the very first step (`dynamodb:CreateTable`) was refused by an **explicit deny in the account's organisation service control policy**, and the tool's rollback found nothing to remove.
+
+Probes with non-creating requests then showed (regions ap-south-1 / us-east-1 / eu-central-1): **explicitly denied by the organisation policy** - Lambda `CreateFunction` (ap-south-1), API Gateway, SSM Parameter Store, DynamoDB, EC2, and CloudWatch Logs outside us-east-1. **Allowed** - IAM role create/delete (tested, then deleted), S3 requests (404 on a missing bucket), reading the Bedrock model catalogue. Not yet tested - Bedrock invocation, S3 bucket creation, Lambda in us-east-1 (my own policy limits Lambda to ap-south-1).
+So the Lambda + API Gateway + DynamoDB design cannot be deployed in this account. It stays in the repo as a tested design (moto) and a ready path for an account without these restrictions. Tests for the cloud code run against a local AWS mock (moto).
 
 ## Why
 To show the system answering real HTTPS requests from the cloud, with approvals and audit records stored in a managed database, so the story is "built, tested **and** run on AWS" - at a cost of cents, deleted straight after recording.
