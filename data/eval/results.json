@@ -1,0 +1,33 @@
+{
+ "metrics": {
+  "questions": 24,
+  "answerable": 18,
+  "unanswerable": 6,
+  "documents": 12,
+  "hit_at_1": 1.0,
+  "hit_at_3": 1.0,
+  "citation_precision": 1.0,
+  "abstention_accuracy": 1.0,
+  "false_abstain_rate": 0.0,
+  "classification_accuracy": 1.0,
+  "route_accuracy": 1.0,
+  "field_accuracy": 1.0,
+  "unsafe_executions": 0,
+  "latency_ms_p50": 1.04,
+  "latency_ms_p95": 3.3,
+  "abstain_threshold": 0.3,
+  "auto_route_confidence": 0.75
+ },
+ "gates": {
+  "hit_at_3": true,
+  "citation_precision": true,
+  "abstention_accuracy": true,
+  "false_abstain_rate": true,
+  "classification_accuracy": true,
+  "route_accuracy": true,
+  "field_accuracy": true,
+  "unsafe_executions": true
+ },
+ "passed": true,
+ "failures": []
+}

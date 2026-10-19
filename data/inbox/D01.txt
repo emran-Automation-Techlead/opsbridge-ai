@@ -1,0 +1,6 @@
+From: Priya Nair (Policy Operations)
+Subject: Update POL-003 review step
+Priority: High
+Due: 2026-11-20
+
+Please update POL-003 so that Policy Operations reviews every change before Product Management. The current order causes rework. We need the change reviewed this month.

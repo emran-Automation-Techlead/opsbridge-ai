@@ -1,0 +1,6 @@
+From: Anika Rao (Procurement)
+Subject: Onboard analytics vendor DataLeaf
+Priority: Medium
+Due: 2026-12-05
+
+Procurement wants to onboard the vendor DataLeaf for site analytics. The vendor will process personal data about visitors. Please start the security questionnaire.

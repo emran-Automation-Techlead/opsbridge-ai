@@ -1,0 +1,6 @@
+From: Dev Patel (Product Management)
+Subject: Shorten effective date for POL-007
+Priority: Medium
+Due: 2026-11-25
+
+Product Management would like to change POL-007 so that the corrections window is 12 hours instead of 24 hours. Please amend the policy.

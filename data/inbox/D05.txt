@@ -1,0 +1,6 @@
+From: Sofia Marin (Content Operations)
+Subject: Sixty day exception to accessibility check
+Priority: Medium
+Due: 2026-11-12
+
+We need a short exception to the accessibility check for the autumn campaign pages. The team will fix the issues after launch. Please record the exception and the risk.

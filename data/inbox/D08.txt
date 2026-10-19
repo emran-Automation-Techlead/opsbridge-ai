@@ -1,0 +1,6 @@
+From: Kofi Mensah (Security Engineering)
+Subject: Privileged access to the audit log store
+Priority: Medium
+Due: 2026-11-08
+
+I need privileged access to the audit log store to run a quarterly review. The Security team lead has asked me to request it.

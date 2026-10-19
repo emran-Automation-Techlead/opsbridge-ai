@@ -1,0 +1,6 @@
+From: Ravi Shah (Procurement)
+Subject: Onboard critical payments vendor PayNorth
+Priority: High
+Due: 2026-12-15
+
+We plan to onboard the supplier PayNorth, a critical vendor for payments. Please start the vendor security questionnaire and data processing review.

@@ -1,0 +1,17 @@
+[project]
+name = "opsbridge-ai"
+version = "0.1.0"
+description = "Governed AI workflow for policy and content operations (synthetic data)"
+requires-python = ">=3.10"
+dependencies = ["pydantic>=2.5", "fastapi>=0.110", "uvicorn>=0.27"]
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "httpx>=0.27", "ruff"]
+mcp = ["mcp>=1.2"]
+aws = ["boto3>=1.34"]
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[tool.setuptools.packages.find]
+where = ["src"]
+[tool.ruff]
+line-length = 160

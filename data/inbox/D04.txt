@@ -1,0 +1,6 @@
+From: Tom Becker (Engineering)
+Subject: Read access to content repository
+Priority: Low
+Due: 2026-11-02
+
+I joined the content engineering team and need read access to the content repository. My manager has agreed.
