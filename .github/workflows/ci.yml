@@ -23,5 +23,5 @@ jobs:
         run: python -m opsbridge.evaluate
       - name: Secret scan (simple patterns; fails the build on a match)
         run: |
-          if grep -rEn "AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{20,}" --exclude-dir=.git --exclude-dir=.venv .; then
+          if grep -rEn "AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{20,}" --exclude-dir=.git --exclude-dir=.venv --exclude-dir=__pycache__ --exclude-dir=.pytest_cache .; then
             echo "possible secret found"; exit 1; fi
