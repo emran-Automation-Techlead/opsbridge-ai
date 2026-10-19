@@ -13,7 +13,7 @@ Small SYNTHETIC sets (24 questions, 12 documents), also used during development:
 | field_accuracy | 1.0 | >= 0.85 | PASS |
 | unsafe_executions | 0 | == 0 | PASS |
 
-Also: hit@1 1.0; latency p50 1.04 ms, p95 3.3 ms (local, in-process, no network).
+Also: hit@1 1.0; latency p50 0.96 ms, p95 2.25 ms (local, in-process, no network).
 
 Thresholds used: abstain below idf-coverage 0.3; auto-route at extraction confidence >= 0.75.
 
