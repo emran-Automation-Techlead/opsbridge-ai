@@ -13,7 +13,11 @@ def isolated_runs(tmp_path, monkeypatch):
     """Every test writes traces/audit/tickets to its own temp dir."""
     monkeypatch.setenv("OPSBRIDGE_RUNS", str(tmp_path / "runs"))
     monkeypatch.delenv("OPSBRIDGE_LLM", raising=False)
+    monkeypatch.delenv("OPSBRIDGE_STORE", raising=False)
+    from opsbridge import store
+    store.reset_cache()
     yield
+    store.reset_cache()
 
 
 def pytest_collection_modifyitems(config, items):

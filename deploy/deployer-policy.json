@@ -1,0 +1,57 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DynamoDbOnlyOpsbridgeTable",
+      "Effect": "Allow",
+      "Action": ["dynamodb:CreateTable", "dynamodb:DeleteTable", "dynamodb:DescribeTable", "dynamodb:UpdateTimeToLive", "dynamodb:DescribeTimeToLive", "dynamodb:TagResource", "dynamodb:Query", "dynamodb:GetItem"],
+      "Resource": "arn:aws:dynamodb:ap-south-1:*:table/opsbridge-live",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+    },
+    {
+      "Sid": "LambdaOnlyOpsbridgeFunction",
+      "Effect": "Allow",
+      "Action": ["lambda:CreateFunction", "lambda:DeleteFunction", "lambda:GetFunction", "lambda:GetFunctionConfiguration", "lambda:AddPermission", "lambda:RemovePermission", "lambda:TagResource", "lambda:InvokeFunction"],
+      "Resource": "arn:aws:lambda:ap-south-1:*:function:opsbridge-live",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+    },
+    {
+      "Sid": "ApiGatewayHttpApis",
+      "Effect": "Allow",
+      "Action": ["apigateway:GET", "apigateway:POST", "apigateway:PATCH", "apigateway:PUT", "apigateway:DELETE"],
+      "Resource": ["arn:aws:apigateway:ap-south-1::/apis", "arn:aws:apigateway:ap-south-1::/apis/*", "arn:aws:apigateway:ap-south-1::/tags/*"]
+    },
+    {
+      "Sid": "LogsOnlyOpsbridgeGroup",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogGroup", "logs:DeleteLogGroup", "logs:PutRetentionPolicy", "logs:TagResource", "logs:FilterLogEvents", "logs:GetLogEvents", "logs:DescribeLogStreams"],
+      "Resource": ["arn:aws:logs:ap-south-1:*:log-group:/aws/lambda/opsbridge-live", "arn:aws:logs:ap-south-1:*:log-group:/aws/lambda/opsbridge-live:*"]
+    },
+    {
+      "Sid": "LogsDescribe",
+      "Effect": "Allow",
+      "Action": ["logs:DescribeLogGroups"],
+      "Resource": "*",
+      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+    },
+    {
+      "Sid": "SsmOnlyOpsbridgeParameters",
+      "Effect": "Allow",
+      "Action": ["ssm:PutParameter", "ssm:DeleteParameter", "ssm:GetParameter", "ssm:AddTagsToResource"],
+      "Resource": "arn:aws:ssm:ap-south-1:*:parameter/opsbridge/live/*"
+    },
+    {
+      "Sid": "IamOnlyOpsbridgeRole",
+      "Effect": "Allow",
+      "Action": ["iam:CreateRole", "iam:DeleteRole", "iam:GetRole", "iam:TagRole", "iam:PutRolePolicy", "iam:DeleteRolePolicy", "iam:GetRolePolicy"],
+      "Resource": "arn:aws:iam::*:role/opsbridge-live-lambda"
+    },
+    {
+      "Sid": "PassRoleOnlyToLambda",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::*:role/opsbridge-live-lambda",
+      "Condition": {"StringEquals": {"iam:PassedToService": "lambda.amazonaws.com"}}
+    }
+  ]
+}

@@ -2,12 +2,11 @@
 This is a deliberately small local implementation. It is NOT Langfuse/Arize; the span fields are chosen so an exporter can be added."""
 from __future__ import annotations
 
-import json
 import time
 import uuid
 from contextlib import contextmanager
 
-from . import config
+from . import store
 from .redact import redact
 
 
@@ -34,7 +33,5 @@ class Trace:
 
     def finish(self) -> float:
         total = round((time.perf_counter() - self._t0) * 1000, 3)
-        path = config.runs_dir() / "trace.jsonl"
-        with path.open("a", encoding="utf-8") as fh:
-            fh.write(json.dumps({"trace_id": self.trace_id, "name": self.name, "total_ms": total, "spans": self.spans}) + "\n")
+        store.get_store().append("trace", {"trace_id": self.trace_id, "name": self.name, "total_ms": total, "spans": self.spans})
         return total

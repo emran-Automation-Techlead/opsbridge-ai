@@ -10,3 +10,5 @@ runs/
 build/
 dist/
 *.egg-info/
+dist/
+deploy/.live-secrets.json

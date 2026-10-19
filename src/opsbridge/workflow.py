@@ -1,9 +1,7 @@
 """End-to-end document workflow: classify -> extract -> validate -> route -> propose tool calls -> gate -> audit."""
 from __future__ import annotations
 
-import json
-
-from . import audit, classify, config, tools
+from . import audit, classify, config, store, tools
 from .models import ActionResult, DocType, ProcessResult, ToolCall
 from .tracing import Trace
 
@@ -49,10 +47,9 @@ def process_document(text: str, actor: str = "intake") -> ProcessResult:
             with trace.span("tool", tool=call.tool):
                 actions.append(tools.dispatch(call, trace.trace_id))
     else:
-        with (config.runs_dir() / "review_queue.jsonl").open("a", encoding="utf-8") as fh:
-            from .redact import redact_text
-            fh.write(json.dumps({"trace_id": trace.trace_id, "reason": "suspicious_text" if suspicious else "low_confidence",
-                                 "confidence": conf, "preview": redact_text(text[:200])}) + "\n")
+        from .redact import redact_text
+        store.get_store().append("review_queue", {"trace_id": trace.trace_id, "reason": "suspicious_text" if suspicious else "low_confidence",
+                                                  "confidence": conf, "preview": redact_text(text[:200])})
     trace.finish()
     return ProcessResult(trace_id=trace.trace_id, doc_type=doc_type, classification_score=score, fields=fields,
                          confidence=conf, route=route, actions=actions)

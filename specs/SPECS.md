@@ -35,3 +35,12 @@ Given an LLM provider is enabled, When it returns text that lacks citations or c
 
 ## SPEC-011 MCP exposes only safe capabilities
 Given the MCP server, When its tools are listed, Then only read-only/low-risk tools are exposed and no approval capability exists.
+
+## SPEC-012 Cloud store with atomic single-use approvals
+Given the DynamoDB-backed store, When audit events, traces and approvals are written, Then the same workflow behaves as with files, and an approval can be decided exactly once even if two decisions race (the second is refused).
+
+## SPEC-013 Serverless entry point fails closed and leaks nothing
+Given the Lambda handler behind an API, When a request arrives, Then only /health is open; other routes need the API key, the decision route also needs the approver token; an unconfigured secret disables the route (503); validation errors never echo the rejected input; responses carry security headers.
+
+## SPEC-014 Safe, reversible cloud deployment
+Given the deployment script, When it is run, Then plan mode prints resources and a cost estimate without calling AWS, apply needs an explicit profile and approval flag, creates only the opsbridge-live resources with least-privilege settings and no secrets in the function environment, rolls back everything if any step fails, and destroy removes everything and is safe to repeat.

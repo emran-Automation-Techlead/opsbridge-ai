@@ -4,4 +4,5 @@ uvicorn>=0.27
 httpx>=0.27
 pytest>=7.4
 mcp>=1.2
+moto[apigateway,apigatewayv2,awslambda,iam,ssm,logs,dynamodb]>=5
 boto3>=1.34

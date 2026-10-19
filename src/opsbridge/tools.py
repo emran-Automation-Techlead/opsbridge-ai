@@ -13,7 +13,7 @@ from typing import Callable
 
 from pydantic import BaseModel, Field, ValidationError
 
-from . import audit, config
+from . import audit, store
 from .models import ActionResult, DocType, Priority, ToolCall
 from .redact import redact
 
@@ -50,8 +50,7 @@ class EscalateToLegal(BaseModel):
 
 def _append(name: str, record: dict) -> str:
     rid = uuid.uuid4().hex[:8]
-    with (config.runs_dir() / name).open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps(redact({"id": rid, "ts": datetime.now(timezone.utc).isoformat(), **record})) + "\n")
+    store.get_store().append(name.removesuffix(".jsonl"), redact({"id": rid, "ts": datetime.now(timezone.utc).isoformat(), **record}))
     return rid
 
 
@@ -70,21 +69,9 @@ REGISTRY: dict[str, tuple[type[BaseModel], str, Callable]] = {
 }
 
 
-# ---------------------------------------------------------------- approvals store
-def _approvals_path(): return config.runs_dir() / "approvals.json"
-
-
-def _load() -> list[dict]:
-    p = _approvals_path()
-    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else []
-
-
-def _save(items: list[dict]) -> None:
-    _approvals_path().write_text(json.dumps(items, indent=1), encoding="utf-8")
-
-
+# ---------------------------------------------------------------- approvals
 def list_approvals(status: str | None = None) -> list[dict]:
-    return [a for a in _load() if status is None or a["status"] == status]
+    return [a for a in store.get_store().approvals_all() if status is None or a["status"] == status]
 
 
 def dispatch(call: ToolCall, trace_id: str, actor: str = "workflow") -> ActionResult:
@@ -99,11 +86,9 @@ def dispatch(call: ToolCall, trace_id: str, actor: str = "workflow") -> ActionRe
         audit.write(trace_id, actor, "tool_call", "invalid", tool=call.tool, errors=[e["loc"] for e in exc.errors()])
         return ActionResult(tool=call.tool, args=call.args, impact=impact, status="invalid", detail="arguments failed schema validation")
     if impact == "high":
-        items = _load()
         aid = uuid.uuid4().hex[:8]
-        items.append({"id": aid, "tool": call.tool, "args": redact(args.model_dump(mode="json")), "status": "pending",
-                      "requested_at": datetime.now(timezone.utc).isoformat(), "trace_id": trace_id, "decided_by": None})
-        _save(items)
+        store.get_store().approval_add({"id": aid, "tool": call.tool, "args": redact(args.model_dump(mode="json")), "status": "pending",
+                                        "requested_at": datetime.now(timezone.utc).isoformat(), "trace_id": trace_id, "decided_by": None})
         audit.write(trace_id, actor, "tool_call", "pending_approval", tool=call.tool, approval_id=aid)
         return ActionResult(tool=call.tool, args=args.model_dump(mode="json"), impact=impact, status="pending_approval", approval_id=aid,
                             detail="high-impact action waits for a human approver")
@@ -113,20 +98,20 @@ def dispatch(call: ToolCall, trace_id: str, actor: str = "workflow") -> ActionRe
 
 
 def decide(approval_id: str, approver: str, approve: bool) -> dict:
-    """Human decision. The approver must differ from the requesting actor ('workflow')."""
+    """Human decision. The approver must be a named human (not the workflow). The status change is atomic: only one decision can win."""
     if not approver or approver == "workflow":
         raise PermissionError("approver must be a named human, not the workflow")
-    items = _load()
-    for a in items:
-        if a["id"] == approval_id:
-            if a["status"] != "pending":
-                raise ValueError(f"approval {approval_id} is already {a['status']}")
-            a["status"] = "approved" if approve else "rejected"
-            a["decided_by"], a["decided_at"] = approver, datetime.now(timezone.utc).isoformat()
-            if approve:
-                schema, _, fn = REGISTRY[a["tool"]]
-                a["result"] = fn(schema(**a["args"]))
-            _save(items)
-            audit.write(a["trace_id"], approver, "approval", a["status"], approval_id=approval_id, tool=a["tool"])
-            return a
-    raise KeyError(approval_id)
+    st = store.get_store()
+    st.approval_get(approval_id)  # KeyError if unknown
+    a = st.approval_transition(approval_id, "pending", "approved" if approve else "rejected",
+                               decided_by=approver, decided_at=datetime.now(timezone.utc).isoformat())
+    if approve:
+        schema, _, fn = REGISTRY[a["tool"]]
+        try:
+            a = st.approval_update(approval_id, result=fn(schema(**a["args"])))
+        except Exception as exc:  # approved but the tool failed: keep the evidence, then surface the error
+            st.approval_update(approval_id, result=f"ERROR: {type(exc).__name__}")
+            audit.write(a["trace_id"], approver, "approval", "approved_but_tool_failed", approval_id=approval_id, tool=a["tool"])
+            raise
+    audit.write(a["trace_id"], approver, "approval", a["status"], approval_id=approval_id, tool=a["tool"])
+    return a
