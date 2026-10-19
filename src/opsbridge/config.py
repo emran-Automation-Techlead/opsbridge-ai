@@ -17,7 +17,7 @@ ABSTAIN_THRESHOLD = float(os.environ.get("OPSBRIDGE_ABSTAIN_THRESHOLD", "0.30"))
 AUTO_ROUTE_CONFIDENCE = float(os.environ.get("OPSBRIDGE_AUTO_ROUTE_CONFIDENCE", "0.75"))
 
 # AWS defaults (Bedrock is OFF unless OPSBRIDGE_LLM=bedrock; nothing in this repo calls AWS by default).
-AWS_REGION = os.environ.get("AWS_REGION", "ap-south-1")
+AWS_REGION = os.environ.get("AWS_REGION", "ap-southeast-2")
 
 
 def runs_dir() -> Path:

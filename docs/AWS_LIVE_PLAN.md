@@ -1,14 +1,15 @@
 # OpsBridge on AWS - live demo plan (needs approval before anything is created)
 
-**Status: BLOCKED (2026-10-20). Nothing exists in AWS.** The apply was attempted once with the approved permissions; the very first step (`dynamodb:CreateTable`) was refused by an **explicit deny in the account's organisation service control policy**, and the tool's rollback found nothing to remove.
+**Status: READY FOR APPROVAL in Sydney (ap-southeast-2). Nothing exists in AWS yet.**
 
-Probes with non-creating requests then showed (regions ap-south-1 / us-east-1 / eu-central-1): **explicitly denied by the organisation policy** - Lambda `CreateFunction` (ap-south-1), API Gateway, SSM Parameter Store, DynamoDB, EC2, and CloudWatch Logs outside us-east-1. **Allowed** - IAM role create/delete (tested, then deleted), S3 requests (404 on a missing bucket), reading the Bedrock model catalogue. Not yet tested - Bedrock invocation, S3 bucket creation, Lambda in us-east-1 (my own policy limits Lambda to ap-south-1).
-So the Lambda + API Gateway + DynamoDB design cannot be deployed in this account. It stays in the repo as a tested design (moto) and a ready path for an account without these restrictions. Tests for the cloud code run against a local AWS mock (moto).
+**Root cause of the first failure (found 2026-10-20 in the AWS console):** a Free-plan account is locked to its assigned region. The console said: *"Your project is assigned to Asia Pacific (Sydney) ap-southeast-2. To access other commercial AWS Regions, upgrade your plan first."* That is why every service I tried in Mumbai, N. Virginia and Frankfurt was refused by the organisation policy. In **ap-southeast-2** read probes show Lambda, API Gateway, DynamoDB, SSM, CloudWatch Logs, S3, CloudFormation and Bedrock are all allowed. This is the technical reason for using Sydney instead of the Mumbai default. Everything below that says ap-south-1 describes the first (failed) attempt; the tooling now targets ap-southeast-2.
+
+History of the first attempt: `apply` was run once against ap-south-1; the first step (`dynamodb:CreateTable`) was refused with an explicit deny in the organisation policy, the automatic rollback found nothing to remove, and test IAM roles created during probing were deleted (verified).
 
 ## Why
 To show the system answering real HTTPS requests from the cloud, with approvals and audit records stored in a managed database, so the story is "built, tested **and** run on AWS" - at a cost of cents, deleted straight after recording.
 
-## Architecture (region ap-south-1, Mumbai)
+## Architecture (region ap-southeast-2, Sydney)
 ```mermaid
 flowchart LR
   C[curl / video demo] -->|HTTPS + x-api-key| A[API Gateway HTTP API - throttled 5 req/s]
@@ -34,7 +35,7 @@ DynamoDB table (on-demand, TTL), CloudWatch log group (3 days), IAM role `opsbri
 For a demo of about 500 requests: Lambda inside the free tier; HTTP API about USD 0.0006; DynamoDB about USD 0.003; logs about USD 0.001; SSM and IAM free. **Total under about USD 0.01-0.05, paid from your credits first.** No hourly charges, so idle cost is about zero, and everything is deleted after recording. Budgets and alerts are not hard spending caps; the throttle (5 requests per second) and the teardown are the real limits.
 
 ## Permissions needed (least privilege)
-Your `portfolio-readonly` user has only `ReadOnlyAccess`. Deploying needs the extra policy in `deploy/deployer-policy.json`: write access limited to the one table, one function, one role, one log group and `/opsbridge/live/*` parameters, in ap-south-1 only; API Gateway actions cannot be limited by name, so they cover HTTP APIs in the region. It grants **no** EC2, RDS, S3, Bedrock, billing, IAM-user or IAM-policy permissions.
+Your `portfolio-readonly` user has only `ReadOnlyAccess`. Deploying needs the extra policy in `deploy/deployer-policy.json`: write access limited to the one table, one function, one role, one log group and `/opsbridge/live/*` parameters, in ap-southeast-2 only; API Gateway actions cannot be limited by name, so they cover HTTP APIs in the region. It grants **no** EC2, RDS, S3, Bedrock, billing, IAM-user or IAM-policy permissions.
 Safest sequence: (1) attach the policy to `portfolio-readonly`; (2) deploy, record, destroy; (3) **detach the policy again**. The policy is derived from the exact calls in `deploy/aws_live.py`; if the first run needs one more permission, I will show you the exact addition before you grant it.
 
 ## Known risk: organisation restrictions
@@ -51,7 +52,7 @@ This account's organisation policy already denies listing Lambda, EC2, RDS, Dyna
 `destroy` removes: API, Lambda, SSM parameters, role policy and role, log group, table, local secrets file. It is safe to run twice and runs automatically when `apply` fails.
 
 ## Approval checklist
-- [ ] Region ap-south-1 and the resource list above
+- [ ] Region ap-southeast-2 and the resource list above
 - [ ] Estimated cost under about USD 0.05 from credits
 - [ ] Attach `deploy/deployer-policy.json` to `portfolio-readonly` temporarily
 - [ ] Teardown right after recording

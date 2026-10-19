@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("aws_live", ROOT / "deploy" / "aws_live.py")
 aws_live = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(aws_live)
-REGION = "ap-south-1"
+REGION = "ap-southeast-2"
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def _inventory(session):
 def test_plan_mode_prints_cost_and_makes_no_aws_calls(capsys):
     assert aws_live.main(["plan"]) == 0
     out = capsys.readouterr().out
-    assert "Estimated cost" in out and "Rollback" in out and "no Bedrock calls" in out and "ap-south-1" in out
+    assert "Estimated cost" in out and "Rollback" in out and "no Bedrock calls" in out and "ap-southeast-2" in out
 
 
 @pytest.mark.spec("SPEC-014")

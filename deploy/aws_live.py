@@ -1,4 +1,4 @@
-"""Deploy / destroy the OpsBridge live demo on AWS (Mumbai, ap-south-1 by default). Uses boto3 with a NAMED profile you choose.
+"""Deploy / destroy the OpsBridge live demo on AWS (Mumbai, ap-southeast-2 by default). Uses boto3 with a NAMED profile you choose.
 
     python deploy/aws_live.py plan    --profile NAME          # default: prints resources + cost estimate, makes NO AWS calls that change anything
     python deploy/aws_live.py apply   --profile NAME --yes-i-approved-the-cost-and-permissions
@@ -168,7 +168,7 @@ def destroy(session, region: str) -> list[str]:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("mode", choices=["plan", "apply", "destroy"], nargs="?", default="plan")
-    p.add_argument("--profile"); p.add_argument("--region", default="ap-south-1")
+    p.add_argument("--profile"); p.add_argument("--region", default="ap-southeast-2")
     p.add_argument("--zip", default=str(ROOT / "dist" / "opsbridge-lambda.zip"))
     p.add_argument("--yes-i-approved-the-cost-and-permissions", action="store_true")
     a = p.parse_args(argv)

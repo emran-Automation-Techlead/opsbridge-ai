@@ -25,8 +25,8 @@ os.environ.setdefault("OPSBRIDGE_RUNS", tempfile.mkdtemp(prefix="opsbridge_live_
 from opsbridge import answer, aws_guard  # noqa: E402
 from opsbridge.providers import BedrockProvider  # noqa: E402
 
-# ASSUMED on-demand prices in USD per 1M tokens (Llama 3 8B class). Verify on the Bedrock pricing page / Billing console.
-ASSUMED_PRICE_IN, ASSUMED_PRICE_OUT = 0.30, 0.60
+# ASSUMED on-demand prices in USD per 1M tokens (Amazon Nova Lite class; the real price may differ). Verify on the Bedrock pricing page / Billing console.
+ASSUMED_PRICE_IN, ASSUMED_PRICE_OUT = 0.06, 0.24
 QUESTIONS = [
     "How long is published content kept before it is archived?",
     "If a vendor will handle personal data, what extra paperwork is needed besides the security questionnaire?",
@@ -40,8 +40,8 @@ QUESTIONS = [
 def main(argv=None) -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--profile", required=True)
-    p.add_argument("--model", default="meta.llama3-8b-instruct-v1:0")
-    p.add_argument("--region", default="ap-south-1")
+    p.add_argument("--model", default="amazon.nova-lite-v1:0")
+    p.add_argument("--region", default="ap-southeast-2")
     p.add_argument("--max-calls", type=int, default=10)
     p.add_argument("--yes-i-approved-the-cost", action="store_true")
     a = p.parse_args(argv)

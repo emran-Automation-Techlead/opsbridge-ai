@@ -18,10 +18,10 @@ ASK = {"question": "How long are audit logs retained?"}
 def cloud(monkeypatch):
     monkeypatch.setenv("AWS_ACCESS_KEY_ID", "testing")
     monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "testing")
-    monkeypatch.setenv("AWS_DEFAULT_REGION", "ap-south-1")
-    monkeypatch.setenv("AWS_REGION", "ap-south-1")
+    monkeypatch.setenv("AWS_DEFAULT_REGION", "ap-southeast-2")
+    monkeypatch.setenv("AWS_REGION", "ap-southeast-2")
     with mock_aws():
-        boto3.client("dynamodb", region_name="ap-south-1").create_table(
+        boto3.client("dynamodb", region_name="ap-southeast-2").create_table(
             TableName=TABLE, BillingMode="PAY_PER_REQUEST",
             AttributeDefinitions=[{"AttributeName": "pk", "AttributeType": "S"}, {"AttributeName": "sk", "AttributeType": "S"}],
             KeySchema=[{"AttributeName": "pk", "KeyType": "HASH"}, {"AttributeName": "sk", "KeyType": "RANGE"}])
@@ -142,7 +142,7 @@ def test_unknown_route_and_large_body(cloud, secrets):
 
 @pytest.mark.spec("SPEC-013")
 def test_secrets_can_come_from_ssm(cloud, monkeypatch):
-    boto3.client("ssm", region_name="ap-south-1").put_parameter(Name="/opsbridge/api-key", Value="from-ssm", Type="SecureString")
+    boto3.client("ssm", region_name="ap-southeast-2").put_parameter(Name="/opsbridge/api-key", Value="from-ssm", Type="SecureString")
     monkeypatch.setenv("API_KEY_PARAM", "/opsbridge/api-key")
     monkeypatch.delenv("API_KEY", raising=False)
     assert lambda_handler.handler(ev("POST", "/ask", ASK, {"x-api-key": "from-ssm"}))["statusCode"] == 200

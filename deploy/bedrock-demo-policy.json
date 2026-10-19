@@ -2,11 +2,19 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "InvokeOneModelInMumbai",
+      "Sid": "InvokeOneModelInSydney",
       "Effect": "Allow",
-      "Action": ["bedrock:InvokeModel"],
-      "Resource": ["arn:aws:bedrock:ap-south-1::foundation-model/meta.llama3-8b-instruct-v1:0"],
-      "Condition": {"StringEquals": {"aws:RequestedRegion": "ap-south-1"}}
+      "Action": [
+        "bedrock:InvokeModel"
+      ],
+      "Resource": [
+        "arn:aws:bedrock:ap-southeast-2::foundation-model/amazon.nova-lite-v1:0"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "ap-southeast-2"
+        }
+      }
     }
   ]
 }
