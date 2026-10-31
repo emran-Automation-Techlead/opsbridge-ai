@@ -1,4 +1,4 @@
-# Interview talking points (answer frameworks, adapt to what you have done)
+# Talking points (answer frameworks, adapt to what you have done)
 
 ## 60-second pitch
 "I built OpsBridge AI to show how I would deliver an AI automation for policy and content operations. It turns request emails into classified, validated tickets, answers policy questions only with citations or says it doesn't know, and holds every high-impact action for a named human approver. It has 79 tests, a quality gate with real metrics, redacted audit logs and traces. The data is synthetic; it ran live on AWS for a short demo and was torn down, and I'm explicit about that. What I want to show is the discipline: acceptance criteria first, controls built in, measured quality, honest limits."
