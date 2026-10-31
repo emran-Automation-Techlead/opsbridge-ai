@@ -87,8 +87,9 @@ On 2026-10-20 the system ran on real AWS in Sydney (API Gateway HTTP API -> Lamb
 - The approval API is disabled unless a token is set. For production, place the API behind your identity provider; the token is a minimal local control.
 - **Cost:** the default build runs entirely locally at no cost. The optional Bedrock provider (default region `ap-southeast-2`) bills per token and must only be enabled after a cost review and explicit approval.
 
-## IJP competencies demonstrated
-See [docs/IJP_MAPPING.md](docs/IJP_MAPPING.md): process automation, AI-first solution design, tool-calling and MCP, evaluation, tracing, spec-driven delivery, governance, and stakeholder-ready documentation, with an honest list of what is **not** covered.
+## Capabilities demonstrated
+
+See [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md): process automation, AI-first solution design, tool-calling and MCP, evaluation, tracing, spec-driven delivery, governance, and stakeholder-ready documentation, with an honest list of what is **not** covered.
 
 ## Limitations and future work
 - Retrieval is lexical (BM25); **no vector database or embeddings** yet. The `Retriever` interface is where Chroma/pgvector/OpenSearch would plug in.
@@ -98,8 +99,9 @@ See [docs/IJP_MAPPING.md](docs/IJP_MAPPING.md): process automation, AI-first sol
 - No load test beyond a few calls; the AWS deployment was a short-lived demo, not a production rollout.
 - Next: embeddings + vector store comparison, LLM extraction behind the same schema, Ragas/LLM-judge evaluation, OTel export, SSO in front of the API, real integrations.
 
-## Interview talking points
-See [docs/INTERVIEW.md](docs/INTERVIEW.md) (technical and delivery-management questions with answer frameworks).
+## Talking points
+
+See [docs/TALKING_POINTS.md](docs/TALKING_POINTS.md) (technical and delivery-management questions with answer frameworks).
 
 ## Video
 Walkthrough videos are produced separately (script in `docs/`); a link will be added here when a verified recording exists.
